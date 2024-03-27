@@ -3,7 +3,7 @@ const replacements = [
     { from: /(?:^|\n)(.*?)\n/g, to: '<p>$1</p>' }, // paragraph
     { 
         from: /(?<![\dA-Za-zА-Яа-я])\*\*([\dA-Za-zА-Яа-я])(.*?)([\dA-Za-zА-Яа-я])\*\*(?![\dA-Za-zА-Яа-я])/,
-        to: '<i>$1$2$3</i>', // bold
+        to: '<b>$1$2$3</b>', // bold
     },
     { 
         from: /(?<![\dA-Za-zА-Яа-я])_([\dA-Za-zА-Яа-я])(.*?)([\dA-Za-zА-Яа-я])_(?![\dA-Za-zА-Яа-я])/,
@@ -11,17 +11,40 @@ const replacements = [
     },
     { 
         from: /(?<![\dA-Za-zА-Яа-я])`([\dA-Za-zА-Яа-я])(.*?)([\dA-Za-zА-Яа-я])`(?![\dA-Za-zА-Яа-я])/,
-        to: '<i>$1$2$3</i>', // monospaced
+        to: '<tt>$1$2$3</tt>', // monospaced
     },
+];
+
+const forbidden = [
+    /(?<![\dA-Za-zА-Яа-я])_([\dA-Za-zА-Яа-я])/,
+    /(?<![\dA-Za-zА-Яа-я])`([\dA-Za-zА-Яа-я])/,
+    /([\dA-Za-zА-Яа-я])\*\*([\dA-Za-zА-Яа-я])/,
+    /([\dA-Za-zА-Яа-я])_(?![\dA-Za-zА-Яа-я])/,
+    /([\dA-Za-zА-Яа-я])`(?![\dA-Za-zА-Яа-я])/,
+    /([\dA-Za-zА-Яа-я])\*\*(?![\dA-Za-zА-Яа-я])/,
 ];
 
 export const convertMarkdown = (text) => {
     const {replaced, preformattedBlocks } = replacePreformatedWithToken(text);
     let html = replaced;
 
-    replacements.slice(1).forEach(replacement => {
+    replacements.slice(2).forEach(replacement => {
         html = html.replace(replacement.from, replacement.to);
     });
+
+    const hasNestedTags = checkForNestedTags(html);
+
+    if (hasNestedTags) {
+        throw new Error('Nested tags are not allowed');
+    }
+
+    const forbiddenTags = checkForbidden(html);
+
+    if (forbiddenTags) {
+        throw new Error('Unopened/unclosed tags');
+    }
+
+    html = html.replace(replacements[1].from, replacements[1].to);
 
     html = replaceTokenWithPreformatted(html, preformattedBlocks);
 
@@ -50,12 +73,20 @@ const replaceTokenWithPreformatted = (text, preformattedBlocks) => {
 }
 
 const checkForNestedTags = (text) => {
-    tegRegexp = /<(\w+)>(.*)<\/\1>/g;
+    const tegRegexp = /<(\w+)>(.*?)<\/\1>/g;
 
     const matches = text.matchAll(tegRegexp);
     for (const match of matches) {
         const [fullMatch, tag, content] = match;
-        if (content.match(tegRegexp)) {
+        if (content.match(tegRegexp) || content.match(/%%PRE%%/)) {
+            return true;
+        }
+    }
+}
+
+const checkForbidden = (text) => {
+    for (const forbiddenTag of forbidden) {
+        if (text.match(forbiddenTag)) {
             return true;
         }
     }

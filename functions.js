@@ -2,26 +2,26 @@ const replacements = [
     { from: /```(.*?)```/gs, to: '<pre>$1</pre>' }, // preformatted
     { from: /(?:^|\n)(.*?)\n/g, to: '<p>$1</p>' }, // paragraph
     { 
-        from: /(?<![\dA-Za-zА-Яа-я])\*\*([\dA-Za-zА-Яа-я])(.*?)([\dA-Za-zА-Яа-я])\*\*(?![\dA-Za-zА-Яа-я])/,
+        from: /(?<![\dA-Za-zА-Яа-яҐґЄєІіЇї])\*\*([\dA-Za-zА-Яа-яҐґЄєІіЇї])(.*?)([\dA-Za-zА-Яа-яҐґЄєІіЇї])\*\*(?![\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
         to: '<b>$1$2$3</b>', // bold
     },
     { 
-        from: /(?<![\dA-Za-zА-Яа-я])_([\dA-Za-zА-Яа-я])(.*?)([\dA-Za-zА-Яа-я])_(?![\dA-Za-zА-Яа-я])/,
+        from: /(?<![\dA-Za-zА-Яа-яҐґЄєІіЇї])_([\dA-Za-zА-Яа-яҐґЄєІіЇї])(.*?)([\dA-Za-zА-Яа-яҐґЄєІіЇї])_(?![\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
         to: '<i>$1$2$3</i>', // italic
     },
     { 
-        from: /(?<![\dA-Za-zА-Яа-я])`([\dA-Za-zА-Яа-я])(.*?)([\dA-Za-zА-Яа-я])`(?![\dA-Za-zА-Яа-я])/,
+        from: /(?<![\dA-Za-zА-Яа-яҐґЄєІіЇї])`([\dA-Za-zА-Яа-яҐґЄєІіЇї])(.*?)([\dA-Za-zА-Яа-яҐґЄєІіЇї])`(?![\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
         to: '<tt>$1$2$3</tt>', // monospaced
     },
 ];
 
 const forbidden = [
-    /(?<![\dA-Za-zА-Яа-я])_([\dA-Za-zА-Яа-я])/,
-    /(?<![\dA-Za-zА-Яа-я])`([\dA-Za-zА-Яа-я])/,
-    /([\dA-Za-zА-Яа-я])\*\*([\dA-Za-zА-Яа-я])/,
-    /([\dA-Za-zА-Яа-я])_(?![\dA-Za-zА-Яа-я])/,
-    /([\dA-Za-zА-Яа-я])`(?![\dA-Za-zА-Яа-я])/,
-    /([\dA-Za-zА-Яа-я])\*\*(?![\dA-Za-zА-Яа-я])/,
+    /(?<![\dA-Za-zА-Яа-яҐґЄєІіЇї])_([\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
+    /(?<![\dA-Za-zА-Яа-яҐґЄєІіЇї])`([\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
+    /([\dA-Za-zА-Яа-яҐґЄєІіЇї])\*\*([\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
+    /([\dA-Za-zА-Яа-яҐґЄєІіЇї])_(?![\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
+    /([\dA-Za-zА-Яа-яҐґЄєІіЇї])`(?![\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
+    /([\dA-Za-zА-Яа-яҐґЄєІіЇї])\*\*(?![\dA-Za-zА-Яа-яҐґЄєІіЇї])/,
 ];
 
 export const convertMarkdown = (text) => {
@@ -87,6 +87,7 @@ const checkForNestedTags = (text) => {
 const checkForbidden = (text) => {
     for (const forbiddenTag of forbidden) {
         if (text.match(forbiddenTag)) {
+            console.log(text.match(forbiddenTag));
             return true;
         }
     }

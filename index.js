@@ -4,7 +4,7 @@ import { convertMarkdown } from './functions.js';
 
 const program = new Command();
 
-program // comment
+program
     .command('convert <file>')
     .description('Convert a markdown file to HTML')
     .option('-o, --out <file>', 'The output file')
